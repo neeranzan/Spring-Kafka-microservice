@@ -1,0 +1,58 @@
+replicaCount: 1
+
+
+deployment:
+  type: @deployment.type@
+
+app:
+  name: @appContainer.name@
+
+consulInfo:
+  token: '@consul.token@'
+
+vaultInfo:
+  token: '@vault.token@'
+
+#initContainer:
+#  applicationName: ${initContainer.applicationName}
+#  name: ${initContainer.name}
+#  image: ${initContainer.image}:${initContainer.version}
+#  pullPolicy: ${initContainer.pullPolicy}
+#  requests:
+#    memory:
+#    cpu:
+#  limits:
+#    memory:
+#    cpu:
+
+container:
+  name: @appContainer.name@
+  image: @appContainer.image@:@appContainer.version@
+  pullPolicy: @appContainer.pullPolicy@
+  requests:
+    memory:
+    cpu:
+  limits:
+    memory:
+    cpu:
+  ports:
+  - name: http-web-pg
+    port: 8082
+
+service:
+  name: consumer-service
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: http-web-pg
+
+volume:
+  name: data
+  mountPath: /tmp
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80

@@ -1,0 +1,61 @@
+# This is the Consul Configuration for the application
+server:
+  port: 8082
+spring:
+  jpa:
+    show-sql: true
+  application:
+    name: consumer
+  datasource:
+    url: jdbc:postgresql://url
+    hikari:
+      connection-timeout: 20000
+      maximum-pool-size: 10
+  kafka:
+    bootstrap-servers: -bootstrap.servers-
+    consumer:
+      group-id: auth-consumer-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+      enable-auto-commit: false
+      auto-offset-reset: latest
+      properties:
+        spring.json.trusted.packages: com.event.*
+        specific.avro.reader: true
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+    properties:
+      retries: 3
+      backoff-period: 10000
+      auto.register.schemas: false
+      use.latest.version: true
+      basic:
+        auth:
+          credentials:
+            source: USER_INFO
+          user:
+            info: ${schema.registry.api.key}:${schema.registry.api.secret}
+      security:
+        protocol: SASL_SSL
+      sasl:
+        mechanism: PLAIN
+        jaas:
+          config: org.apache.kafka.common.security.plain.PlainLoginModule required username='${kafka.cluster.api.key}' password='${kafka.cluster.api.secret}';
+      schema.registry.url: -schema.registry.url-
+    listener:
+      ack-mode: manual_immediate
+
+logging:
+  level:
+    org.springframework.orm: DEBUG
+
+kafka:
+  topic:
+    auth:
+      api_request_log_entry:
+        topic_name: -topic.name-
+        concurrency: 1
+      api_table_capture:
+        topic_name: -topic.name-
+        concurrency: 1

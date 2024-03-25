@@ -1,0 +1,10 @@
+apiVersion: v2
+name: @helm.chart.name@
+description: @helm.chart.description@
+sources:
+  - @project.scm.url@
+type: application
+version: @helm.chart.version@
+appVersion: @project.version@
+keywords: 
+  - @helm.chart.name@

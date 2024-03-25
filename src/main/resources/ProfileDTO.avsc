@@ -1,0 +1,17 @@
+{
+  "namespace": "com.mes.event.dto",
+  "type": "record",
+  "name": "ProfileDTO",
+  "fields": [
+    {
+      "name": "merchantName",
+      "type": "string",
+      "default": "null"
+    },
+    {
+      "name": "status",
+      "type": "boolean",
+      "default": false
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.app.name }}
+  labels:
+    {{- include "consumer.labels" . | nindent 4 }}
+spec:
+{{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+{{- end }}
+  selector:
+    matchLabels:
+      app: {{ .Values.app.name }}
+  template:
+    metadata:
+      labels:
+        {{- include "consumer.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - name: {{ .Values.container.name }}
+        image: {{ .Values.container.image }}
+        imagePullPolicy: {{ .Values.container.pullPolicy }}
+        envFrom:
+          - secretRef:
+              name: consul-info
+          - secretRef:
+              name: vault-info
+        ports:
+        {{- range .Values.container.ports }}
+        - containerPort: {{ .port }}
+          name: {{ .name }}
+        {{- end }}
+        volumeMounts:
+        - name: {{ .Values.volume.name }}
+          mountPath: {{ .Values.volume.mountPath }}
+        resources:
+          requests:
+            memory: {{ .Values.container.requests.memory }}
+            cpu: {{ .Values.container.requests.cpu }}
+          limits:
+            memory: {{ .Values.container.limits.memory }}
+            cpu: {{ .Values.container.limits.cpu }}
+      volumes:
+      - name: {{ .Values.volume.name }}
+        emptyDir: {}
